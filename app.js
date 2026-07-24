@@ -63,6 +63,38 @@ app.get('/api/courses', (req, res) => {
     }
 });
 
+// GET course statistics (Bonus Challenge)
+// Defined BEFORE /api/courses/:id to prevent Express from treating "stats" as an ID
+app.get('/api/courses/stats', (req, res) => {
+    try {
+        const courses = loadCourses();
+        const totalCourses = courses.length;
+
+        const statusCounts = {
+            "Not Started": 0,
+            "In Progress": 0,
+            "Completed": 0
+        };
+
+        courses.forEach(course => {
+            if (statusCounts[course.status] !== undefined) {
+                statusCounts[course.status]++;
+            }
+        });
+
+        res.status(200).json({
+            success: true,
+            total_courses: totalCourses,
+            by_status: statusCounts
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: `Failed to retrieve stats: ${error.message}`
+        });
+    }
+});
+
 // GET specific course
 app.get('/api/courses/:id', (req, res) => {
     try {
